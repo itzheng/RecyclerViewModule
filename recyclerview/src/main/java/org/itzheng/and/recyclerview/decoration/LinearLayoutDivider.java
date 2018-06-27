@@ -195,7 +195,7 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
         Log.d(TAG, "getItemOffsets itemPosition:" + itemPosition);
         Log.d(TAG, "getItemOffsets childCount:" + childCount);
         if (getOrientation(parent) == LinearLayoutManager.HORIZONTAL) {
-            int left = 0, top = 0, right = 0, bottom = mSize;
+            int left = 0, top = 0, right = mSize, bottom = 0;
             if (itemPosition == 0) {//顶部
                 if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_BEGINNING) != 0) {
                     //如果顶部有横线，需要设置间距
