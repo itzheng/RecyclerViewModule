@@ -38,18 +38,67 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
         int top;
         int bottom;
         final int childCount = parent.getChildCount();
+        int itemCount = parent.getAdapter().getItemCount();
+        Log.d(TAG, "onDraw childCount:" + childCount);
+        Log.d(TAG, "onDraw itemCount:" + itemCount);
         if (getOrientation(parent) == LinearLayoutManager.HORIZONTAL) {
             top = parent.getPaddingTop() + mMarginTop;
             bottom = parent.getHeight() - parent.getPaddingBottom() - mMarginBottom;
-
-            for (int i = 0; i < childCount - 1; i++) {
+//            for (int i = 0; i < childCount - 1; i++) {
+//                final View child = parent.getChildAt(i);
+//                final RecyclerView.LayoutParams params =
+//                        (RecyclerView.LayoutParams) child.getLayoutParams();
+//                left = child.getRight() + params.rightMargin;
+//                right = left + mSize;
+//                mDivider.setBounds(left, top, right, bottom);
+//                mDivider.draw(c);
+//            }
+            boolean clipToPadding = parent.getClipToPadding();
+            int paddingLeft = parent.getPaddingLeft();
+            for (int i = 0; i < childCount; i++) {
                 final View child = parent.getChildAt(i);
                 final RecyclerView.LayoutParams params =
                         (RecyclerView.LayoutParams) child.getLayoutParams();
-                left = child.getRight() + params.rightMargin;
-                right = left + mSize;
-                mDivider.setBounds(left, top, right, bottom);
-                mDivider.draw(c);
+                //添加顶部分割线
+                if (i == 0) {
+                    if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_BEGINNING) != 0) {
+                        left = child.getLeft() - params.rightMargin;
+                        right = left - mSize;
+                        mDivider.setBounds(left, top, right, bottom);
+                        mDivider.draw(c);
+                    }
+                }
+                //结束
+                if (i == childCount - 1) {
+                    Log.d(TAG, "onDraw: childCount - 1 " + i);
+                    if (itemCount == childCount) {
+                        //这个是全部显示了，如果最后一天需要显示则显示
+                        if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_END) != 0) {
+                            left = child.getRight() + params.rightMargin;
+                            right = left + mSize;
+                            mDivider.setBounds(left, top, right, bottom);
+                            mDivider.draw(c);
+                            Log.d(TAG, "onDraw: childCount - 1 " + i + ",left:" + left);
+                        }
+                    } else {
+                        //未全部显示状态，如果中间的需要显示，则最后一条显示
+                        if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_MIDDLE) != 0) {
+                            left = child.getRight() + params.rightMargin;
+                            right = left + mSize;
+                            mDivider.setBounds(left, top, right, bottom);
+                            mDivider.draw(c);
+                            Log.d(TAG, "onDraw: childCount - 1 " + i + ",left:" + left);
+                        }
+                    }
+
+                }
+                //中间
+                if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_MIDDLE) != 0) {
+                    left = child.getLeft() - params.rightMargin;
+                    right = left - mSize;
+                    mDivider.setBounds(left, top, right, bottom);
+                    mDivider.draw(c);
+                }
             }
         } else {
             left = parent.getPaddingLeft() + mMarginLeft;
@@ -74,24 +123,25 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
                         mDivider.draw(c);
                     }
                 }
-                //底部
-                if (i == childCount - 1) {
-                    if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_END) != 0) {
-                        top = child.getBottom() + params.bottomMargin + mMarginTop;//+距离顶部
-                        bottom = top + mSize;
-                        top = getNewTop(top, paddingTop, clipToPadding);
-                        mDivider.setBounds(left, top, right, bottom);
-                        mDivider.draw(c);
-                    }
-                } else
-                    //中间
-                    if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_MIDDLE) != 0) {
-                        top = child.getBottom() + params.bottomMargin + mMarginTop;//+距离顶部
-                        bottom = top + mSize;
-                        top = getNewTop(top, paddingTop, clipToPadding);
-                        mDivider.setBounds(left, top, right, bottom);
-                        mDivider.draw(c);
-                    }
+//                //底部
+//                if (i == childCount - 1) {
+//                    if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_END) != 0) {
+//                        //尾部如果不需要显示线，测量的时候并没有把位置给空出来
+//                        top = child.getBottom() + params.bottomMargin + mMarginTop;//+距离顶部
+//                        bottom = top + mSize;
+//                        top = getNewTop(top, paddingTop, clipToPadding);
+//                        mDivider.setBounds(left, top, right, bottom);
+//                        mDivider.draw(c);
+//                    }
+//                } else
+                //中间
+                if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_MIDDLE) != 0) {
+                    top = child.getBottom() + params.bottomMargin + mMarginTop;//+距离顶部
+                    bottom = top + mSize;
+                    top = getNewTop(top, paddingTop, clipToPadding);
+                    mDivider.setBounds(left, top, right, bottom);
+                    mDivider.draw(c);
+                }
             }
         }
     }
@@ -142,9 +192,11 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
 //        final int childCount = parent.getChildCount();
         RecyclerView.Adapter adapter = parent.getAdapter();
         final int childCount = adapter.getItemCount();
+        Log.d(TAG, "getItemOffsets itemPosition:" + itemPosition);
+        Log.d(TAG, "getItemOffsets childCount:" + childCount);
         if (getOrientation(parent) == LinearLayoutManager.HORIZONTAL) {
-            int left = 0, top = 0, right = mSize, bottom = 0;
-            if (itemPosition == 0) {
+            int left = 0, top = 0, right = 0, bottom = mSize;
+            if (itemPosition == 0) {//顶部
                 if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_BEGINNING) != 0) {
                     //如果顶部有横线，需要设置间距
                     left = mSize;
@@ -156,12 +208,32 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
                     right = mSize;
                 }
             } else if (itemPosition == childCount - 1) {
-
+                //底部
+                if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_END) == 0) {
+//                    //如果顶部有横线，需要设置间距
+                    right = 0;
+                } else {
+                    right = mSize;
+                }
+            } else {
+                //中间
+                if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_MIDDLE) == 0) {
+//                    //如果顶部有横线，需要设置间距
+                    right = 0;
+                } else {
+                    right = mSize;
+                }
+            }
+            Log.d(TAG, "left:" + left + ",right:" + right);
+            //添加实际的高度，要加上边距
+            if (left != 0) {
+                left = left + mMarginLeft + mMarginRight;
+            }
+            if (right != 0) {
+                right = right + mMarginLeft + mMarginRight;
             }
             outRect.set(left, top, right, bottom);
         } else {
-            Log.d(TAG, "itemPosition:" + itemPosition);
-            Log.d(TAG, "childCount:" + childCount);
             int left = 0, top = 0, right = 0, bottom = mSize;
             if (itemPosition == 0) {//顶部
                 if ((mShowDivider & DecorationManager.ShowDivider.SHOW_DIVIDER_BEGINNING) != 0) {
@@ -200,21 +272,8 @@ public class LinearLayoutDivider extends RecyclerView.ItemDecoration {
 
                 bottom = bottom + mMarginTop + mMarginBottom;
             }
-//            //当这个返回true时，如果有padding，分割线会显示在padding上面，需要进行细节处理
-//            boolean clipToPadding = parent.getClipToPadding();
-//            if (clipToPadding) {
-//                View view = parent.getChildAt(itemPosition);
-//                int paddingTop = parent.getPaddingTop();
-//                float y = view.getY();
-//                Log.d(TAG, "paddingTop:" + paddingTop + " " + "y:" + y);
-//                outRect.set(left, top, right, bottom);
-//            } else {
-//                outRect.set(left, top, right, bottom);
-//            }
             outRect.set(left, top, right, bottom);
         }
-        //默认都是0
-//        super.getItemOffsets(outRect, itemPosition, parent);
     }
 
     /**
