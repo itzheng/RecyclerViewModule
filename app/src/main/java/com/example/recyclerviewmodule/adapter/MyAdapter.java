@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.example.recyclerviewmodule.R;
 
 import org.itzheng.and.recyclerview.adapter.BaseRecyclerAdapter;
+import org.itzheng.and.recyclerview.adapter.BaseRecyclerLoadHintAdapter;
 
 /**
  * Title:<br>
@@ -16,21 +17,26 @@ import org.itzheng.and.recyclerview.adapter.BaseRecyclerAdapter;
  * @email ItZheng@ZoHo.com
  * Created by itzheng on 2018-6-27.
  */
-public class MyAdapter extends BaseRecyclerAdapter<MyAdapter.ViewHolder> {
+public class MyAdapter extends BaseRecyclerLoadHintAdapter<MyAdapter.ViewHolder> {
+    public MyAdapter() {
+//        setHintEnable(false);
+    }
+
     @Override
-    public View onCreateView(ViewGroup parent, int viewType) {
+    public View onCreateRealView(ViewGroup parent, int viewType) {
         return LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_item_test, parent, false);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(onCreateView(parent, viewType));
+    public void onBindRealViewHolder(ViewHolder holder, int position) {
+
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-
+    public ViewHolder onCreateRealViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(onCreateView(parent, viewType));
     }
+
 
     @Override
     public int getItemCount() {

@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapter() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rcvContent.setLayoutManager(linearLayoutManager);
         rcvContent.addItemDecoration(DividerManager.getDecoration(this));
         rcvContent.setAdapter(new MyAdapter());
